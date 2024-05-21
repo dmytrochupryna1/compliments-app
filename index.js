@@ -7,7 +7,7 @@
 // messages are order to the list in reverse order, meaning the latest one is on top
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"
-import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"
 
 const authorEl = document.getElementById('author-el');
 const inputEl = document.getElementById('input-el');
@@ -25,40 +25,46 @@ const db = getDatabase(app);
 const messagesRef = ref(db, 'messages');
 
 
+// onValue snapshot of messagesRef is taken, and the messages are rendered on the page
+onValue(messagesRef, (snapshot) => {
+    const messages = Object.values(snapshot.val());
+    const listEl = document.getElementById('all-items');
+    listEl.innerHTML = '';
 
-
-
-
-
-
-
-
-
-// add message to db on click
-
-publishBtn.addEventListener('click', function() {
-    push(messagesRef, inputEl.value)
-    console.log(`${inputEl.value } is added to "messages" db`)
+    messages.reverse().forEach((message) => {        
+        const messageEl = document.createElement('div');
+        messageEl.className = 'item'
+        messageEl.innerHTML = 
+            `
+                <h3>Dima</h3>
+                <p>${message}</p>
+                <p>3 💓</p>
+                `;
+        listEl.appendChild(messageEl);
+    })
 })
 
 
+publishBtn.addEventListener('click', function() { // add message to db on click
+    // to messageRef add inputEl.value but also who currently is the author
+
+    const messageData = {
+        message: inputEl.value,
+        author: authorEl.textContent
+    }
 
 
+    push(messagesRef, messageData)
+    console.log(`${inputEl.value} by ${authorEl.textContent} is added to "messages" db`);
+    inputEl.value = '';
+})
 
 
-
-
-
-
-
-
-authorEl.addEventListener('click', function() {
+authorEl.addEventListener('click', function() { // toggles author name on click 
 
     if (authorEl.textContent === 'Dima') {
         authorEl.textContent = 'Asya';
     } else {
         authorEl.textContent = 'Dima';
     }
-
-    // authorEl.textContent = 'Asya';
 })
