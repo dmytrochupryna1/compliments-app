@@ -66,4 +66,23 @@ button {
     border: 1px solid black;
     background-color: #ced7ee;
     width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.message-author {
+    margin-bottom: 10px;
+}
+
+.message-message {
+    margin-bottom: 10px;
+}
+
+.message-likes {
+    border: 1px solid rgb(75, 60, 60);
+    width: fit-content;
+    padding: 10px;
+    border-radius: 64px;
 }

@@ -39,14 +39,14 @@ onValue(messagesRef, (snapshot) => {
 
         if (message.likes === 0) {
             messageEl.innerHTML = `
-                <h3>${message.author}</h3>
-                <p>${message.message}</p>
+                <h3 class="message-author">${message.author}</h3>
+                <p class="message-message">${message.message}</p>
             `;
         } else {
             messageEl.innerHTML = `
-                <h3>${message.author}</h3>
-                <p>${message.message}</p>
-                <p>${message.likes} 💓</p>
+                <h3 class="message-author">${message.author}</h3>
+                <p class="message-message">${message.message}</p>
+                <p class="message-likes">${message.likes} 💓</p>
             `;
         }
         listEl.appendChild(messageEl);
