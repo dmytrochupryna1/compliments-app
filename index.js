@@ -36,8 +36,8 @@ onValue(messagesRef, (snapshot) => {
         messageEl.className = 'item'
         messageEl.innerHTML = 
             `
-                <h3>Dima</h3>
-                <p>${message}</p>
+                <h3>${message.author}</h3>
+                <p>${message.message}</p>
                 <p>3 💓</p>
                 `;
         listEl.appendChild(messageEl);
