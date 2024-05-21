@@ -7,8 +7,9 @@
 // messages are order to the list in reverse order, meaning the latest one is on top
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"
+import { getDatabase, ref, push, onValue, get, update } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"
 
+// DOM elements
 const authorEl = document.getElementById('author-el');
 const inputEl = document.getElementById('input-el');
 const publishBtn = document.getElementById('publish-btn');
@@ -16,49 +17,52 @@ const publishBtn = document.getElementById('publish-btn');
 
 // connect firebase db here, db url is https://realtime-database-7e33c-default-rtdb.europe-west1.firebasedatabase.app/
 
-const appSettings = {
+const appSettings = { // firebase app settings
     databaseURL: 'https://realtime-database-7e33c-default-rtdb.europe-west1.firebasedatabase.app/'
 }
-
+// Initialize Firebase
 const app = initializeApp(appSettings);
 const db = getDatabase(app);
 const messagesRef = ref(db, 'messages');
 
 
-// onValue snapshot of messagesRef is taken, and the messages are rendered on the page
 onValue(messagesRef, (snapshot) => {
-    const messages = Object.values(snapshot.val());
+    const messages = snapshot.val();
     const listEl = document.getElementById('all-items');
     listEl.innerHTML = '';
 
-    messages.reverse().forEach((message) => {        
+    Object.keys(messages).reverse().forEach((key) => {
+        const message = messages[key];
         const messageEl = document.createElement('div');
-        messageEl.className = 'item'
-        messageEl.innerHTML = 
-            `
+        messageEl.className = 'item';
+        messageEl.dataset.key = key; // Store the Firebase key as a data attribute
+
+        if (message.likes === 0) {
+            messageEl.innerHTML = `
                 <h3>${message.author}</h3>
                 <p>${message.message}</p>
-                <p>3 💓</p>
-                `;
+            `;
+        } else {
+            messageEl.innerHTML = `
+                <h3>${message.author}</h3>
+                <p>${message.message}</p>
+                <p>${message.likes} 💓</p>
+            `;
+        }
         listEl.appendChild(messageEl);
-    })
-})
+    });
+});
 
-
-publishBtn.addEventListener('click', function() { // add message to db on click
-    // to messageRef add inputEl.value but also who currently is the author
-
+publishBtn.addEventListener('click', function() {  // add message to db on click
     const messageData = {
         message: inputEl.value,
-        author: authorEl.textContent
+        author: authorEl.textContent,
+        likes: 0
     }
-
-
     push(messagesRef, messageData)
-    console.log(`${inputEl.value} by ${authorEl.textContent} is added to "messages" db`);
+    console.log(`${inputEl.value} by ${authorEl.textContent} is added to "messages" db with 0 likes`);
     inputEl.value = '';
 })
-
 
 authorEl.addEventListener('click', function() { // toggles author name on click 
 
@@ -68,3 +72,32 @@ authorEl.addEventListener('click', function() { // toggles author name on click
         authorEl.textContent = 'Dima';
     }
 })
+
+
+// on click of specific class "item", a like is added to db and rendered on page
+
+document.addEventListener('click', function(e) {
+    let targetElement = e.target; // Start with the target element
+
+    // Traverse up the DOM until you find an element with class 'item' or until you run out of parent elements
+    while (targetElement != null && !targetElement.classList.contains('item')) {
+        targetElement = targetElement.parentElement;
+    }
+
+    // If an 'item' element was found, handle the click
+    if (targetElement && targetElement.classList.contains('item')) {
+        const key = targetElement.dataset.key; // Retrieve the key from the data attribute
+        const messageRef = ref(db, 'messages/' + key);
+
+        get(messageRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const message = snapshot.val();
+                const updatedLikes = (message.likes || 0) + 1; // Increment likes, defaulting to 0 if undefined
+
+                update(messageRef, { likes: updatedLikes }); // Update the likes in Firebase
+                console.log(`${message.message} by ${message.author} has ${updatedLikes} likes`);
+            }
+        });
+    }
+});
+
