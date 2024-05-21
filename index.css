@@ -45,6 +45,10 @@ textarea {
     height: 70px;
     resize: none;
     border-radius: 8px;
+    /* text-align: center; */
+    /* vertically also put input in the center */
+
+    
     
 }
 
@@ -72,17 +76,23 @@ button {
     align-items: center;
 }
 
+.item:hover {
+    background-color: #b5c0d9;
+
+}
+
 .message-author {
-    margin-bottom: 10px;
+    /* margin-bottom: 10px; */
 }
 
 .message-message {
-    margin-bottom: 10px;
+    margin: 15px 0px;
 }
 
 .message-likes {
     border: 1px solid rgb(75, 60, 60);
-    width: fit-content;
+    width: 40px;
     padding: 10px;
     border-radius: 64px;
+    text-align: center;
 }

@@ -37,6 +37,14 @@ onValue(messagesRef, (snapshot) => {
         messageEl.className = 'item';
         messageEl.dataset.key = key; // Store the Firebase key as a data attribute
 
+        /* if author of the message is Dima, background is red, if Asya it is blue */
+
+        if (message.author === 'Dima') {
+            messageEl.style.backgroundColor = '#a1a7ec';
+        } else {
+            messageEl.style.backgroundColor = '#eea9e5';
+        }
+
         if (message.likes === 0) {
             messageEl.innerHTML = `
                 <h3 class="message-author">${message.author}</h3>
